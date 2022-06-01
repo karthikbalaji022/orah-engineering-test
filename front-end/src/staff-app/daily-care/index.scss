@@ -1,0 +1,72 @@
+$bgbutton:rgba(0,0,0,1);
+$textcolor:rgb(247, 247, 247);
+
+button{
+    outline:none;
+    border: none;
+}
+.common{
+    margin-bottom: 5px;
+    padding:7px;
+    background-color: $bgbutton;
+    color: $textcolor;
+    margin:7px 0;
+
+}
+
+.ascButton
+{
+    @extend .common;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-right: 1px solid white;
+}
+.fButton{
+        @extend .common;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-right: 1px solid white;
+}
+
+.dscButton
+{
+    @extend .common;
+    border-top-right-radius:5px;
+    border-bottom-right-radius:5px;
+}
+.lButton{
+    @extend .common;
+    border-top-right-radius:5px;
+    border-bottom-right-radius:5px;
+   
+}
+
+.hamburger{
+    background-color: #343f64;
+    top:0;
+    left:-32%;
+    width:200px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    //justify-content: center;
+    align-items: center;
+    box-shadow: -5px 9px 10px 5px rgba(0,0,0,.3);
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-top-right-radius: 0;
+    animation: fadeIn 400ms ease-in-out ;
+    -webkit-animation: fadeIn 400ms ease-in-out ;
+}
+
+@keyframes fadeIn {
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
