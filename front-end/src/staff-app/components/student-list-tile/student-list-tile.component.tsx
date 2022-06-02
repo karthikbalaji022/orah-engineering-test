@@ -7,10 +7,12 @@ import { Person, PersonHelper } from "shared/models/person"
 import { RollStateSwitcher } from "staff-app/components/roll-state/roll-state-switcher.component"
 
 interface Props {
-  isRollMode?: boolean
-  student: Person
+  isRollMode?: boolean,
+  student: Person,
+  rolls:any,
+  setRoll:React.Dispatch<React.SetStateAction<{}[]>>
 }
-export const StudentListTile: React.FC<Props> = ({ isRollMode, student }) => {
+export const StudentListTile: React.FC<Props> = ({ isRollMode, student,rolls,setRoll }) => {
   return (
     <S.Container>
       <S.Avatar url={Images.avatar}></S.Avatar>
@@ -19,7 +21,7 @@ export const StudentListTile: React.FC<Props> = ({ isRollMode, student }) => {
       </S.Content>
       {isRollMode && (
         <S.Roll>
-          <RollStateSwitcher />
+          <RollStateSwitcher  initialState={rolls[student.id-1].roll_state} id={student.id} rolls={setRoll}/>
         </S.Roll>
       )}
     </S.Container>
