@@ -1,4 +1,5 @@
-import React, { useState, useEffect, ReactElement, createContext } from "react"
+import React, { useState, useEffect, ReactElement, createContext } from "react";
+import {useNavigate} from 'react-router-dom'
 import styled from "styled-components"
 import Button from "@material-ui/core/ButtonBase"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -19,10 +20,9 @@ import { Roll, RollInput } from "shared/models/roll"
 
 //useContext being used for state management
 export const studentContext :React.Context<{}>=createContext({});
-type rollType="all"|"present"|"late"|"absent";
-
 
 export const HomeBoardPage: React.FC = () => {
+  const navigate=useNavigate();
   const [isRollMode, setIsRollMode] = useState(false)
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
   const [getRolls, rolldata, rollloadState] = useApi<{ rolls: Roll[] }>({ url: "save-roll" })
@@ -37,6 +37,7 @@ const [student_roll_states,setRollStates]=useState([{}]);
   const [students,setStudents]=useState(data?.students) ;
   const [studentIterator,setIterator]=useState([] as Person[]);
   const [debounce,setDebounce]=useState("");
+  //set iterator for students data to work on
   useEffect(()=>{
     if(students && rollCurType=="all"){
       const pass=[...students]
@@ -47,9 +48,14 @@ const [student_roll_states,setRollStates]=useState([{}]);
       })
       setIterator(filter);
     }
+    return ()=>{};
+
   },[rollCurType,students])
+  //invoke getstudents function from useApi
   useEffect(() => {
-    void getStudents()
+    getStudents()
+    return ()=>{};
+
   }, [getStudents])
 
   //get the roll state and roll data
@@ -83,6 +89,8 @@ useEffect(()=>{
     setRollStates(rollItems);
   }
     }
+    return ()=>{};
+
   },[data,rolldata]);
 
   //sorting the data based on the toggle states
@@ -140,10 +148,18 @@ useEffect(()=>{
   }
 
   const onActiveRollAction = (action: ActiveRollAction) => {
-    if (action === "exit") {
+    if (action === "exit" || action==="complete") {
       setIsRollMode(false);
       getRolls({student_roll_states:student_roll_states});
       setRollType("all");
+      if(action==="complete"){
+      const timer= setTimeout(()=>{
+        if(student_roll_states && students)
+        navigate("/staff/activity",{state:{states:[...student_roll_states],students:[...students]}});
+        clearTimeout(timer);
+      },0);
+      
+    }
     }
   }
   //implemented the call from debounce to  search functionality
