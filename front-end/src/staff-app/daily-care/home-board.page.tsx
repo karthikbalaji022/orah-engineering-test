@@ -18,12 +18,15 @@ import "./index.scss";
 import { Roll, RollInput } from "shared/models/roll"
 
 //useContext being used for state management
-export const studentList :React.Context<{}>=createContext({});
+export const studentContext :React.Context<{}>=createContext({});
+type rollType="all"|"present"|"late"|"absent";
+
 
 export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
   const [getRolls, rolldata, rollloadState] = useApi<{ rolls: Roll[] }>({ url: "save-roll" })
+  const [rollCurType,setRollType]=useState("all");
 //storing roll states
 const [student_roll_states,setRollStates]=useState([{}]);
   //sort order state
@@ -32,7 +35,19 @@ const [student_roll_states,setRollStates]=useState([{}]);
   const [lastName,setLastName]=useState(false);
 //implemented debounce state for searching
   const [students,setStudents]=useState(data?.students) ;
+  const [studentIterator,setIterator]=useState([] as Person[]);
   const [debounce,setDebounce]=useState("");
+  useEffect(()=>{
+    if(students && rollCurType=="all"){
+      const pass=[...students]
+     setIterator(pass);
+    }else if(students){
+      const filter=students.filter((item)=>{
+        return student_roll_states[item.id-1].roll_state===rollCurType;
+      })
+      setIterator(filter);
+    }
+  },[rollCurType,students])
   useEffect(() => {
     void getStudents()
   }, [getStudents])
@@ -72,9 +87,9 @@ useEffect(()=>{
 
   //sorting the data based on the toggle states
   useEffect(()=>{
-    if(students)
+    if(studentIterator)
     {
-      const studentSort=[...students];
+      const studentSort=[...studentIterator];
       if(ascending){
           studentSort.sort((a,b)=>{
             if(firstName && lastName )
@@ -109,7 +124,7 @@ useEffect(()=>{
             }
           });
         }
-      setStudents(studentSort);
+      setIterator(studentSort);
     }
   },[ascending,firstName,lastName])
   // debounce functionality
@@ -128,6 +143,7 @@ useEffect(()=>{
     if (action === "exit") {
       setIsRollMode(false);
       getRolls({student_roll_states:student_roll_states});
+      setRollType("all");
     }
   }
   //implemented the call from debounce to  search functionality
@@ -143,7 +159,7 @@ useEffect(()=>{
     }
   }
   return (
-    <studentList.Provider value={{students,setStudents,data}}>
+    <studentContext.Provider value={{rollCurType,setRollType}}>
       <S.PageContainer>
         <Toolbar onItemClick={onToolbarAction} debounceFun={setDebounce} asc={ascending} order={setOrder} fname={firstName} lname={lastName} setFname={setFirstName} setLname={setLastName}/>
 
@@ -155,9 +171,11 @@ useEffect(()=>{
 
         {loadState === "loaded" && data?.students && (
           <>
-            {students?.map((s) => (
+            {studentIterator?.map((s,index) => {
+
+              return(
               <StudentListTile key={s.id} isRollMode={isRollMode} student={s} rolls={student_roll_states} setRoll={setRollStates}/>
-            ))}
+            )})}
           </>
         )}
 
@@ -169,7 +187,7 @@ useEffect(()=>{
       </S.PageContainer>
 
       <ActiveRollOverlay isActive={isRollMode} onItemClick={onActiveRollAction} studentRoll={student_roll_states}/>
-    </studentList.Provider>
+    </studentContext.Provider>
   )
 }
 
