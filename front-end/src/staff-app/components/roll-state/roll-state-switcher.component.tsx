@@ -1,7 +1,6 @@
 import React, { useState,useContext, useEffect } from "react"
 import { RolllStateType } from "shared/models/roll"
 import { RollStateIcon } from "staff-app/components/roll-state/roll-state-icon.component"
-import {studentList} from '../../daily-care/home-board.page'
 import { useApi } from "shared/hooks/use-api";
 import { get, add, LocalStorageKey,addIfNotExist } from "shared/helpers/local-storage"
 import { Roll, RollInput } from "shared/models/roll"

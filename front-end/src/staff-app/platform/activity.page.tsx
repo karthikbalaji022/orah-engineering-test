@@ -9,16 +9,25 @@ import { Images } from "assets/images"
 import { Backdrop } from "@material-ui/core"
 import { FaBlackberry } from "react-icons/fa"
 import './activity.scss';
-
-
 export const ActivityPage: React.FC = () => {
   useEffect(()=>{
     return ()=>{};
   },[]);
   const navigate=useNavigate();
   const location=useLocation();
-  const studentsStates=location.state.states;
-  const students=location.state.students;
+  if(!location.state)
+  {
+    return(
+      <h1>Please click the <i>complete button</i> in Start roll description window...</h1>
+      )
+    }
+    const ss=location.state.states;
+    const s=location.state.students;
+
+
+  const studentsStates=[...ss];
+  const studentData=[...s];
+  // const students=location.state?.students;
   const present: Person[]=[];
   const absent: Person[]=[];
   const late: Person[]=[];
@@ -26,13 +35,13 @@ export const ActivityPage: React.FC = () => {
     if(element.roll_state==="present")
     {
       
-      present.push(students[index]);
+      present.push(studentData[index]);
     }else if(element.roll_state==="absent")
     {
-      absent.push(students[index]);
+      absent.push(studentData[index]);
     }else if(element.roll_state==="late")
     {
-      late.push(students[index]);
+      late.push(studentData[index]);
     }
   });
   return (

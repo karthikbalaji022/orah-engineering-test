@@ -16,7 +16,7 @@ import { StudentListTile } from "staff-app/components/student-list-tile/student-
 import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active-roll-overlay/active-roll-overlay.component"
 //import sass file
 import "./index.scss";
-import { Roll, RollInput } from "shared/models/roll"
+import { Roll } from "shared/models/roll"
 
 //useContext being used for state management
 export const studentContext :React.Context<{}>=createContext({});
@@ -24,8 +24,11 @@ export const studentContext :React.Context<{}>=createContext({});
 export const HomeBoardPage: React.FC = () => {
   const navigate=useNavigate();
   const [isRollMode, setIsRollMode] = useState(false)
+  //get student api
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
+  // get roll api
   const [getRolls, rolldata, rollloadState] = useApi<{ rolls: Roll[] }>({ url: "save-roll" })
+  //current roll type all || present || absent || late
   const [rollCurType,setRollType]=useState("all");
 //storing roll states
 const [student_roll_states,setRollStates]=useState([{}]);
@@ -35,7 +38,9 @@ const [student_roll_states,setRollStates]=useState([{}]);
   const [lastName,setLastName]=useState(false);
 //implemented debounce state for searching
   const [students,setStudents]=useState(data?.students) ;
+  //student iterator to take values from parent student and process data
   const [studentIterator,setIterator]=useState([] as Person[]);
+  //debounce state for optimizing search
   const [debounce,setDebounce]=useState("");
   //set iterator for students data to work on
   useEffect(()=>{
@@ -49,13 +54,11 @@ const [student_roll_states,setRollStates]=useState([{}]);
       setIterator(filter);
     }
     return ()=>{};
-
   },[rollCurType,students])
   //invoke getstudents function from useApi
   useEffect(() => {
     getStudents()
     return ()=>{};
-
   }, [getStudents])
 
   //get the roll state and roll data
@@ -229,13 +232,13 @@ const Toolbar: React.FC<ToolbarProps> = (props) => {
     // nav bar search and sort functionality
     <S.ToolbarContainer>
       <div onClick={() => onItemClick("sort")} >
-          <div onClick={()=>setHam(prev=>!prev)} style={{display:"flex",justifyContent:"center",alignItems:"center",gap:"5px"}}>
+          <S.SortHead onClick={()=>setHam(prev=>!prev)} >
                 {
                   hamburger==true?(<AiOutlineClose/>):(<GiHamburgerMenu/>)
                 }
                 <span>Sort By:</span>
 
-          </div>
+          </S.SortHead>
         {hamburger===true &&(
           <div className="hamburger" style={{position:"absolute"}}>
             <S.sortTitle>Sort options: </S.sortTitle>
@@ -265,7 +268,7 @@ const Toolbar: React.FC<ToolbarProps> = (props) => {
       />
       </S.Search>
 
-      <S.Button onClick={() => onItemClick("roll")}>Start Roll</S.Button>
+      <S.Button onClick={() => onItemClick("roll")}><span style={{ border:"1px solid white",padding:"5px"}}>Start Roll</span></S.Button>
     </S.ToolbarContainer>
   )
 }
@@ -277,6 +280,18 @@ const S = {
     flex-direction: column;
     width: 50%;
     margin: ${Spacing.u4} auto 140px;
+  `,
+  SortHead: styled.div`
+    cursor:pointer;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:5px;
+    transition:all 300ms ease-in-out;
+    &:hover{
+      color:#a6f7c1;
+      font-size: 15px;
+    }
   `,
   ToolbarContainer: styled.div`
     display: grid;
@@ -297,6 +312,11 @@ const S = {
       padding: ${Spacing.u2};
       font-weight: ${FontWeight.strong};
       border-radius: ${BorderRadius.default};
+      transition: all 300ms ease-in-out;
+      &:hover{
+        font-size: 14px;
+      }
+
     }
   `,
   Search: styled.div`
