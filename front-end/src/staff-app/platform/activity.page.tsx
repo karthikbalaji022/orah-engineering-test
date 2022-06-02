@@ -1,4 +1,4 @@
-import React,{useEffect} from "react"
+import React,{useContext, useEffect} from "react"
 import { useNavigate,useLocation } from "react-router-dom"
 import styled from "styled-components"
 import {Roll} from '../../shared/models/roll'
@@ -9,20 +9,28 @@ import { Images } from "assets/images"
 import { Backdrop } from "@material-ui/core"
 import { FaBlackberry } from "react-icons/fa"
 import './activity.scss';
+import { globalStudent } from "staff-app/app"
+interface Context{
+  globalStudents:Person[],
+  setGlobalStudents:React.Dispatch<React.SetStateAction<Person[] | undefined>>,
+  globalRoll:Roll[],
+  setGlobalRoll:React.Dispatch<React.SetStateAction<[]>>
+}
 export const ActivityPage: React.FC = () => {
+  const {globalStudents,setGlobalStudents,globalRoll,setGlobalRoll}=useContext(globalStudent) as Context;
   useEffect(()=>{
     return ()=>{};
   },[]);
   const navigate=useNavigate();
   const location=useLocation();
-  if(!location.state)
+  if(!globalStudents && !globalRoll)
   {
     return(
-      <h1>Please click the <i>complete button</i> in Start roll description window...</h1>
+      <h1>No student record or state found, make sure you click on the complete button to load your student info..</h1>
       )
     }
-    const ss=location.state.states;
-    const s=location.state.students;
+    const ss=[...globalRoll];
+    const s=[...globalStudents];
 
 
   const studentsStates=[...ss];

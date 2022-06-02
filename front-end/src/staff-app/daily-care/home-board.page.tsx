@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactElement, createContext } from "react";
+import React, { useState, useEffect, ReactElement, createContext,useContext } from "react";
 import {useNavigate} from 'react-router-dom'
 import styled from "styled-components"
 import Button from "@material-ui/core/ButtonBase"
@@ -17,11 +17,18 @@ import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active
 //import sass file
 import "./index.scss";
 import { Roll } from "shared/models/roll"
-
+import { globalStudent } from "staff-app/app";
+interface Context{
+  globalStudents:Person[],
+  setGlobalStudents:React.Dispatch<React.SetStateAction<Person[] | undefined>>,
+  globalRoll:Roll[],
+  setGlobalRoll:React.Dispatch<React.SetStateAction<{}[]>>
+}
 //useContext being used for state management
 export const studentContext :React.Context<{}>=createContext({});
 
 export const HomeBoardPage: React.FC = () => {
+  const {globalStudents,setGlobalStudents,globalRoll,setGlobalRoll}=useContext(globalStudent) as Context;
   const navigate=useNavigate();
   const [isRollMode, setIsRollMode] = useState(false)
   //get student api
@@ -91,6 +98,7 @@ useEffect(()=>{
     });
     setRollStates(rollItems);
   }
+  
     }
     return ()=>{};
 
@@ -156,6 +164,8 @@ useEffect(()=>{
       getRolls({student_roll_states:student_roll_states});
       setRollType("all");
       if(action==="complete"){
+        setGlobalRoll(student_roll_states);
+        setGlobalStudents(students);
       const timer= setTimeout(()=>{
         if(student_roll_states && students)
         navigate("/staff/activity",{state:{states:[...student_roll_states],students:[...students]}});
