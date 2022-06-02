@@ -13,6 +13,7 @@ interface Props {
 
 export const ActiveRollOverlay: React.FC<Props> = (props) => {
   const { isActive, onItemClick ,studentRoll} = props
+  //taking count for roll state candidates
   var [present,late,absent]=[0,0,0];
     studentRoll.forEach((element:any) => {
       if(element.roll_state==="present")

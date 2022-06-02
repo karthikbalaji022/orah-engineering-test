@@ -18,6 +18,7 @@ interface Context{
 export const RollStateList: React.FC<Props> = ({ stateList, size = 14, onItemClick }) => {
   const {rollCurType,setRollType}=useContext(studentContext) as Context;
   const onClick = (type: ItemType) => {
+    //change the global role type state on click
     setRollType(type);
     if (onItemClick) {
       onItemClick(type)

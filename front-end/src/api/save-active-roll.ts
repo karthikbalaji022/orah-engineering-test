@@ -6,14 +6,15 @@ export async function saveActiveRoll(roll: RollInput): Promise<ApiResponse<{roll
   try {
     const rollsInStorage = get<Roll[]>(LocalStorageKey.rolls)
     const newRollId = rollsInStorage !== undefined ? rollsInStorage[rollsInStorage.length - 1].id + 1 : 1
+   //if params is passed then add the new roll to last of localstorage
     if(roll){
       const rollsToSave = rollsInStorage !== undefined ? [...rollsInStorage, createRoll(newRollId, roll)] : [createRoll(newRollId, roll)]
     add(LocalStorageKey.rolls, rollsToSave)
   }
   await httpMock({ randomFailure: true })
+  //get the last index of localstorage and pass it as rolls result value
   const storageRoll=get<Roll[]>(LocalStorageKey.rolls);
   const cur=storageRoll?storageRoll[storageRoll.length-1]:undefined;
-  // console.log(cur," in save actitive rolls");
     return {
       success: true,
       rolls:cur
