@@ -28,6 +28,13 @@ export async function saveActiveRoll(roll: RollInput): Promise<ApiResponse<{roll
   }
 }
 
+export function getRoll():  Roll[] | undefined {
+  const rolls = get<Roll[]>(LocalStorageKey.rolls);
+  console.log(rolls," in get roll");
+  return rolls;
+
+}
+
 function createRoll(id: number, input: RollInput) {
   return {
     id,

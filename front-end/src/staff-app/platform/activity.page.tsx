@@ -1,15 +1,14 @@
-import React,{useContext, useEffect} from "react"
-import { useNavigate,useLocation } from "react-router-dom"
+import React,{ useEffect,useState} from "react"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import {Roll} from '../../shared/models/roll'
+import { ActivityRoll } from "shared/models/activity"
 import { Person, PersonHelper } from "shared/models/person"
 import { Spacing, BorderRadius, FontWeight } from "shared/styles/styles"
 import { Colors } from "shared/styles/colors"
 import { Images } from "assets/images"
-import { Backdrop } from "@material-ui/core"
-import { FaBlackberry } from "react-icons/fa"
 import './activity.scss';
-import { globalStudent } from "staff-app/app"
+import {useApi} from '../../shared/hooks/use-api'
 interface Context{
   globalStudents:Person[],
   setGlobalStudents:React.Dispatch<React.SetStateAction<Person[] | undefined>>,
@@ -17,94 +16,112 @@ interface Context{
   setGlobalRoll:React.Dispatch<React.SetStateAction<[]>>
 }
 export const ActivityPage: React.FC = () => {
-  const {globalStudents,setGlobalStudents,globalRoll,setGlobalRoll}=useContext(globalStudent) as Context;
+  // const {globalStudents,setGlobalStudents,globalRoll,setGlobalRoll}=useContext(globalStudent) as Context;
+  const [getActivity,data,loadState] = useApi<{ }>({ url: "get-activities" })
+  const [studentActivity,setStudent]=useState<Person[]>([]);
+  const [rollActivity,setRoll]=useState<ActivityRoll[]>([]);
+  //get the activity state for students and rolls
   useEffect(()=>{
+    getActivity();
     return ()=>{};
-  },[]);
+  },[getActivity]);
+  //store student data and roll data in usestate hook
+  useEffect(()=>{
+    setStudent(data?.activityPerson);
+    setRoll(data?.activityRoll);
+  },[data,loadState])
+  
   const navigate=useNavigate();
-  const location=useLocation();
-  if(!globalStudents && !globalRoll)
+  //if loading return fetch jsx
+  if(!studentActivity || !rollActivity)
   {
     return(
-      <h1>No student record or state found, make sure you click on the complete button to load your student info..</h1>
+        <h1>Fetching data...</h1>
       )
     }
-    const ss=[...globalRoll];
-    const s=[...globalStudents];
 
-
-  const studentsStates=[...ss];
-  const studentData=[...s];
-  // const students=location.state?.students;
-  const present: Person[]=[];
-  const absent: Person[]=[];
-  const late: Person[]=[];
-  studentsStates.forEach((element: any,index: number) => {
-    if(element.roll_state==="present")
-    {
-      
-      present.push(studentData[index]);
-    }else if(element.roll_state==="absent")
-    {
-      absent.push(studentData[index]);
-    }else if(element.roll_state==="late")
-    {
-      late.push(studentData[index]);
-    }
-  });
+    //destructure the states for mapping
+  const studentsStates=[...rollActivity];
+  const studentData=[...studentActivity];
+ 
   return (
       <S.Container>
         <S.ButtonDashboard onClick={()=>{navigate(-1)}}>Go Back</S.ButtonDashboard>
-        <S.StateContainer>
-        <details >
-          <summary className="present">Present -({present.length})</summary>
-          {
-            present.map((item)=>{
-              return(
-                <S.PersonContainer key={item.id}>
+        <details className="mainDetail">
+          <summary className="mainSum">Get roll info</summary>
+        {studentsStates.map((item,index)=>{
+          return(
+            <div key={index} style={{margin:"30px",width:"100%"}}>
+              <details style={{width:"100%"}} >
 
-                <S.Avatar url={Images.avatar}></S.Avatar>
-                <S.Content>
-                  <div>{PersonHelper.getFullName(item)}</div>
-                </S.Content>
-              </S.PersonContainer>
-              )
-            })
-          }
-        </details>
-        <details >
-          <summary className="late" >Late -({late.length})</summary>
-          {
-            late.map((item)=>{
-              return(
-                <S.PersonContainer  key={item.id}>
+            <summary className="mainSum">Rolled on - {
+            String(item.entity.completed_at).split('T')[0]+" "+String(item.entity.completed_at).split('T')[1].split('.')[0]
+            }</summary>
+            <S.StateContainer>
+              <details style={{width:"100%"}}>
+                <summary className="present">Present -({item.status?.present.length})</summary>
+                <S.studentContainer>
 
-                <S.Avatar url={Images.avatar}></S.Avatar>
-                <S.Content>
-                  <div>{PersonHelper.getFullName(item)}</div>
-                </S.Content>
-              </S.PersonContainer>
-              )
-            })
-          }
-        </details>
-        <details>
-          <summary className="absent" >Absent -({absent.length})</summary>
-          {
-            absent.map((item)=>{
-              return(
-                <S.PersonContainer  key={item.id}>
+                {
+                  item.status.present.map((item)=>{
+                    return(
+                      <S.PersonContainer key={item}>
 
-                <S.Avatar url={Images.avatar}></S.Avatar>
-                <S.Content>
-                  <div>{PersonHelper.getFullName(item)}</div>
-                </S.Content>
-              </S.PersonContainer>
-              )
-            })
-          }
-        </details>
+                      <S.Avatar url={Images.avatar}></S.Avatar>
+                      <S.Content>
+                        <div>{PersonHelper.getFullName(studentData[item-1])}</div>
+                      </S.Content>
+                    </S.PersonContainer>
+                    )
+                  })
+                }
+                </S.studentContainer>
+              </details>
+              <details style={{width:"100%"}}>
+                <summary className="late">Late -({item.status?.late.length})</summary>
+                <S.studentContainer>
+                {
+                  item.status.late.map((item)=>{
+                    return(
+                      <S.PersonContainer key={item}>
+
+                      <S.Avatar url={Images.avatar}></S.Avatar>
+                      <S.Content>
+                        <div>{PersonHelper.getFullName(studentData[item-1])}</div>
+                      </S.Content>
+                    </S.PersonContainer>
+                    )
+                  })
+                }
+                </S.studentContainer>
+              </details>
+              <details style={{width:"100%"}}>
+                <summary className="absent">Absent -({item.status?.absent.length})</summary>
+                <S.studentContainer>
+
+                {
+                  item.status.absent.map((item)=>{
+                    return(
+                      <S.PersonContainer key={item}>
+
+                      <S.Avatar url={Images.avatar}></S.Avatar>
+                      <S.Content>
+                        <div>{PersonHelper.getFullName(studentData[item-1])}</div>
+                      </S.Content>
+                    </S.PersonContainer>
+                    )
+                  })
+                }
+                </S.studentContainer>
+              </details>
         </S.StateContainer>
+        </details>
+
+              </div>
+              )}
+              )}
+              </details>
+       
       </S.Container>
   )
 }
@@ -169,6 +186,13 @@ var S = {
    width:100%;
    display:flex;
    flex-direction:column;
+   justify-content: center;
+   align-items: center;
    min-height:100px;
+ `,
+ studentContainer: styled.div`
+   border-radius: 5px;
+   padding:5px;
+   box-shadow: 0 0 5px 2px rgba(0,0,0,.5);
  `
 }
