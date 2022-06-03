@@ -9,7 +9,7 @@ export async function getHomeboardStudents(): Promise<ApiResponse<{ students: Pe
     await httpMock({ randomFailure: true })
     return {
       success: true,
-      students: addIfNotExist(LocalStorageKey.students, generateStudents(14)),
+      students: addIfNotExist(LocalStorageKey.students, generateStudents(30)),
     }
   } catch (error) {
     return {

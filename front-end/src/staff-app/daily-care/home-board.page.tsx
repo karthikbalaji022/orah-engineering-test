@@ -17,7 +17,7 @@ import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active
 //import sass file
 import "./index.scss";
 import { Roll } from "shared/models/roll"
-import { globalStudent } from "staff-app/app";
+// import { globalStudent } from "staff-app/app";
 interface Context{
   globalStudents:Person[],
   setGlobalStudents:React.Dispatch<React.SetStateAction<Person[] | undefined>>,
@@ -28,7 +28,7 @@ interface Context{
 export const studentContext :React.Context<{}>=createContext({});
 
 export const HomeBoardPage: React.FC = () => {
-  const {globalStudents,setGlobalStudents,globalRoll,setGlobalRoll}=useContext(globalStudent) as Context;
+  // const {globalStudents,setGlobalStudents,globalRoll,setGlobalRoll}=useContext(globalStudent) as Context;
   const navigate=useNavigate();
   const [isRollMode, setIsRollMode] = useState(false)
   //get student api
@@ -161,11 +161,11 @@ useEffect(()=>{
   const onActiveRollAction = (action: ActiveRollAction) => {
     if (action === "exit" || action==="complete") {
       setIsRollMode(false);
-      getRolls({student_roll_states:student_roll_states});
       setRollType("all");
       if(action==="complete"){
-        setGlobalRoll(student_roll_states);
-        setGlobalStudents(students);
+        getRolls({student_roll_states:student_roll_states});
+        // setGlobalRoll(student_roll_states);
+        // setGlobalStudents(students);
       const timer= setTimeout(()=>{
         if(student_roll_states && students)
         navigate("/staff/activity",{state:{states:[...student_roll_states],students:[...students]}});
