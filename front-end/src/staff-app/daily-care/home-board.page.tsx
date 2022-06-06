@@ -46,9 +46,21 @@ const [student_roll_states,setRollStates]=useState<RollData[]>([]);
 //implemented debounce state for searching
   const [students,setStudents]=useState(data?.students) ;
   //student iterator to take values from parent student and process data
-  const [studentIterator,setIterator]=useState([] as Person[]);
+  const [studentIterator,setIterator]=useState<Person[]>([]);
   //debounce state for optimizing search
   const [debounce,setDebounce]=useState("");
+
+    //invoke getstudents function from useApi
+    useEffect(() => {
+      getStudents()
+      return ()=>{};
+    }, [getStudents])  
+
+     //get the roll state and roll data
+    useEffect(()=>{
+      getRolls();
+    },[getRolls])
+
   //set iterator for students data to work on
   useEffect(()=>{
     if(students && rollCurType=="all"){
@@ -61,17 +73,7 @@ const [student_roll_states,setRollStates]=useState<RollData[]>([]);
       setIterator(filter);
     }
     return ()=>{};
-  },[rollCurType,students])
-  //invoke getstudents function from useApi
-  useEffect(() => {
-    getStudents()
-    return ()=>{};
-  }, [getStudents])
-
-  //get the roll state and roll data
-useEffect(()=>{
-  getRolls();
-},[getRolls])
+  },[rollCurType,students]) 
 
   // setting the data in student state
   useEffect(()=>{
