@@ -15,11 +15,16 @@ interface Context{
   globalRoll:Roll[],
   setGlobalRoll:React.Dispatch<React.SetStateAction<[]>>
 }
+interface dataType{
+  success: boolean,
+  activityRoll: ActivityRoll[],
+  activityPerson:Person[] | undefined
+}
 export const ActivityPage: React.FC = () => {
   // const {globalStudents,setGlobalStudents,globalRoll,setGlobalRoll}=useContext(globalStudent) as Context;
-  const [getActivity,data,loadState] = useApi<{ }>({ url: "get-activities" })
-  const [studentActivity,setStudent]=useState<Person[]>([]);
-  const [rollActivity,setRoll]=useState<ActivityRoll[]>([]);
+  const [getActivity,data,loadState] = useApi<dataType>({ url: "get-activities" })
+  const [studentActivity,setStudent]=useState<Person[] | undefined>([]);
+  const [rollActivity,setRoll]=useState<ActivityRoll[] | undefined>([]);
   //get the activity state for students and rolls
   useEffect(()=>{
     getActivity();

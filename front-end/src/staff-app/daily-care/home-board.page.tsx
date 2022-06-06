@@ -16,7 +16,7 @@ import { StudentListTile } from "staff-app/components/student-list-tile/student-
 import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active-roll-overlay/active-roll-overlay.component"
 //import sass file
 import "./index.scss";
-import { Roll } from "shared/models/roll"
+import { Roll,RollData } from "shared/models/roll"
 // import { globalStudent } from "staff-app/app";
 interface Context{
   globalStudents:Person[],
@@ -34,11 +34,11 @@ export const HomeBoardPage: React.FC = () => {
   //get student api
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
   // get roll api
-  const [getRolls, rolldata, rollloadState] = useApi<{ rolls: Roll[] }>({ url: "save-roll" })
+  const [getRolls, rolldata, rollloadState] = useApi<{ rolls: Roll }>({ url: "save-roll" })
   //current roll type all || present || absent || late
   const [rollCurType,setRollType]=useState("all");
 //storing roll states
-const [student_roll_states,setRollStates]=useState([{}]);
+const [student_roll_states,setRollStates]=useState<RollData[]>([]);
   //sort order state
   const [ascending,setOrder]=useState(true);
   const [firstName,setFirstName]=useState(false);
@@ -80,7 +80,7 @@ useEffect(()=>{
     //if local storage has no values stored then create a roll state record with unmark as default value
     if(data.students && rolldata?.rolls===undefined){
 
-    const rollItems=data.students.map((item,index)=>{
+    const rollItems: RollData[]=data.students.map((item,index)=>{
       return {
         student_id:item.id,
         roll_state:"unmark"
@@ -88,9 +88,9 @@ useEffect(()=>{
     });
     setRollStates(rollItems);
   }else if(rolldata){
-    const rollStruct =rolldata.rolls;
+    const rollStruct: Roll =rolldata.rolls;
     //to-do roll state is defined find out why the error is occuring
-    const rollItems=rollStruct?.student_roll_states.map((item:any)=>{
+    const rollItems: RollData[]=rollStruct?.student_roll_states.map((item:any)=>{
 
       return {
         ...item

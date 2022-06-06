@@ -3,14 +3,14 @@ import { RolllStateType } from "shared/models/roll"
 import { RollStateIcon } from "staff-app/components/roll-state/roll-state-icon.component"
 import { useApi } from "shared/hooks/use-api";
 import { get, add, LocalStorageKey,addIfNotExist } from "shared/helpers/local-storage"
-import { Roll, RollInput } from "shared/models/roll"
+import { Roll, RollInput,RollData } from "shared/models/roll"
 
 interface Props {
   initialState?: RolllStateType
   size?: number
   onStateChange?: (newState: RolllStateType) => void,
   id:number,
-  rolls:React.Dispatch<React.SetStateAction<{}[]>>
+  rolls:React.Dispatch<React.SetStateAction<RollData[]>>
 }
 export const RollStateSwitcher: React.FC<Props> = ({ initialState = "unmark", size = 40, onStateChange,id ,rolls}) => {
   const [rollState, setRollState] = useState(initialState)

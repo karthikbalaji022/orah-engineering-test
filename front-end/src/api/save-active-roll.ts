@@ -14,7 +14,7 @@ export async function saveActiveRoll(roll: RollInput): Promise<ApiResponse<{roll
   await httpMock({ randomFailure: true })
   //get the last index of localstorage and pass it as rolls result value
   const storageRoll=get<Roll[]>(LocalStorageKey.rolls);
-  const cur=storageRoll?storageRoll[storageRoll.length-1]:undefined;
+  const cur: Roll | undefined=storageRoll?storageRoll[storageRoll.length-1]:undefined;
     return {
       success: true,
       rolls:cur
